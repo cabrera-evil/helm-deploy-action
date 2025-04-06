@@ -1,0 +1,53 @@
+name: Helm CLI - Deploy Action
+description: A Bash-based Helm deploy helper supporting install/upgrade/status/logs etc.
+author: cabrera-evil
+branding:
+  icon: "cloud"
+  color: "gray-dark"
+inputs:
+  command:
+    description: Helm command to execute (install, upgrade, uninstall, etc.)
+    required: true
+  namespace:
+    description: Kubernetes namespace (optional)
+    required: false
+  release:
+    description: Helm release name (optional)
+    required: false
+  stage:
+    description: Deployment stage (e.g. dev, prod) to select values.<stage>.yaml
+    required: false
+  dir:
+    description: Helm chart directory
+    required: false
+    default: "."
+  values:
+    description: Custom values file path (optional)
+    required: false
+  repo:
+    description: Remote Helm repository URL (optional)
+    required: false
+  repo-name:
+    description: Helm repository alias name (optional, default is "remote")
+    required: false
+  chart:
+    description: Chart name in the remote repo (required if using repo)
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - run: chmod +x ${{ github.action_path }}/deploy.sh
+      shell: bash
+
+    - run: |
+        ${{ github.action_path }}/deploy.sh ${{ inputs.command }} \
+          --namespace "${{ inputs.namespace }}" \
+          --release "${{ inputs.release }}" \
+          --stage "${{ inputs.stage }}" \
+          --dir "${{ inputs.dir }}" \
+          --values "${{ inputs.values }}" \
+          --repo "${{ inputs.repo }}" \
+          --repo-name "${{ inputs.repo-name }}" \
+          --chart "${{ inputs.chart }}"
+      shell: bash
